@@ -1,0 +1,489 @@
+;; Verified public-register citations for the legal entity archived by this repository.
+;;
+;; Every row is checked live by tools/verify_citations.cljs:
+;;   * GET :cite/url must answer HTTP 2xx
+;;   * :cite/expect-substring must appear in the response body
+;;
+;; A URL that cannot be fetched, or whose body no longer carries the claim, is a
+;; DRIFT and fails the gate. Nothing is recorded here that was not retrieved.
+;;
+;; FOUR independent authorities are cited, not one:
+;;   * GLEIF, the global LEI system
+;;   * the British Crown, via Companies House
+;;   * the National Stock Exchange of India, in its own published equity list
+;;   * the issuer itself, at the website blueprint.edn records for it
+;;
+;; THE HOME REGISTER IS NOT AMONG THEM, AND THAT IS THE MAIN LIMITATION HERE.
+;; GLEIF names RA000394 -- the Companies Register of India's Ministry of Corporate
+;; Affairs -- as BOTH the register of record and the validation authority for this
+;; entity (rows gleif-registered-at and gleif-validated-at). It could not be cited:
+;; www.mca.gov.in answers HTTP 403. So the CIN L17110MH1973PLC019786, the single
+;; most load-bearing identifier in this catalog, is attested by GLEIF ALONE. No row
+;; below should be read as standing in for the Indian register.
+;;
+;; WHAT THE CORROBORATION ACTUALLY RUNS THROUGH. Two things, and they are different
+;; in kind:
+;;
+;;   THE GROUP, through a state register that does answer. GLEIF says RELIANCE
+;;   GLOBAL ENERGY SERVICES LIMITED, UK company 06626084, is a child of this LEI ->
+;;   Companies House prints that name, that number and that registered office in its
+;;   own record. Two authorities that never consulted each other agree on the
+;;   subsidiary.
+;;
+;;   THE LISTED COMPANY, through an exchange. The NSE equity list names "Reliance
+;;   Industries Limited", symbol RELIANCE, listed 29-NOV-1995, ISIN INE002A01018.
+;;
+;; NEITHER OF THOSE CARRIES THE CIN OR THE LEI. The UK register does not name the
+;; parent at all -- row uk-ch-psc-none is the UK state affirmatively recording that
+;; the subsidiary has NO person of significant control. NSE identifies by name and
+;; domestic ISIN, and GLEIF does not carry INE002A01018 (its ISIN list holds only
+;; the US-numbered GDR and bonds), so that row is new information rather than a
+;; second witness to an existing one. The join from "the NSE-listed Reliance
+;; Industries Limited" to "LEI 5493003UOETFYRONLG31" rests on the legal name.
+;;
+;; THE ISSUER DOES NAME ITSELF -- unlike some siblings in this catalog family. Both
+;; cited ril.com pages carry "Reliance Industries Limited" in the <title>, and the
+;; contact page publishes the Nariman Point address that GLEIF records. Those rows
+;; are therefore :identity. The issuer does NOT publish its CIN on any page reached
+;; here (checked: /privacy-policy, /contact-us, and the site root -- zero hits for
+;; L17110MH1973PLC019786), so it corroborates the name and the address, not the
+;; registration.
+;;
+;; :cite/row-kind is the honest part of this catalog and should be read before the
+;; claims:
+;;
+;;   :identity   the substring names this entity, its identifiers, or a specific
+;;               related legal entity. Point the URL at a different company and
+;;               the row fails.
+;;   :attribute  the substring is TRUE OF THIS ENTITY BUT NOT ONLY OF IT (status
+;;               ACTIVE, country IN, city MUMBAI, legal form DDKQ). Such a row can
+;;               survive a swap to a similar company. It is recorded because it is
+;;               checked and true, not because it identifies.
+;;   :definition the row resolves a code used by another row (RA000394, DDKQ), or
+;;               fixes the column labels of a CSV. It says the named register or
+;;               legal form exists; it says nothing about Reliance.
+;;
+;; Of the entries below, 29 are :identity, 21 are :attribute and 8 are
+;; :definition. A reader who treats all 58 as identifying would overstate what this
+;; catalog proves -- which is the error this field exists to prevent.
+;;
+;; Substrings are taken from the RAW response body and were each checked against
+;; the fetched bytes before this file was written. Escaping facts found that way:
+;;   * GLEIF escapes the forward slash, so gleif-ocid expects "in\\/L17110..." and
+;;     gleif-ra-website expects "http:\\/\\/www.mca.gov.in\\/MCA21\\/"; the unescaped
+;;     forms occur nowhere in the bytes.
+;;
+;; RELATIONSHIP ENDPOINTS ARE CITED SINGLY, NOT BY PAGE. GLEIF's /direct-children
+;; is paginated and its page 1 is not a stable set, so a row against it would drift
+;; for reasons that have nothing to do with this entity. Each related company is
+;; instead cited through its OWN record plus its OWN /direct-parent (or
+;; /ultimate-parent), which are single objects. Recron Malaysia has no direct-parent
+;; record at all -- /direct-parent answers 404 -- so its row cites /ultimate-parent
+;; and says so.
+;;
+;; SOURCES TESTED AND REJECTED. Each answered HTTP 2xx, which is exactly why they
+;; are named here rather than silently dropped -- a row against any of them would
+;; have passed forever and proved nothing. See :catalog/unreachable.
+
+
+{:catalog/subject
+ #:company{:legal-name "RELIANCE INDUSTRIES LIMITED"
+           :lei "5493003UOETFYRONLG31"
+           :jurisdiction "IN-MH"
+           :registered-at "RA000394"
+           :registered-as "L17110MH1973PLC019786"
+           :legal-form "DDKQ"
+           :website "https://www.ril.com/"}
+ :catalog/authorities
+ [
+{:authority/id :gleif
+   :authority/name "Global Legal Entity Identifier Foundation"
+   :authority/root "https://api.gleif.org/"}
+  {:authority/id :uk-companies-house
+   :authority/name "Companies House (United Kingdom)"
+   :authority/root "https://find-and-update.company-information.service.gov.uk/"}
+  {:authority/id :in-nse
+   :authority/name "National Stock Exchange of India"
+   :authority/root "https://nsearchives.nseindia.com/"}
+  {:authority/id :issuer
+   :authority/name "Reliance Industries, at its own published website"
+   :authority/root "https://www.ril.com/"}
+ ]
+ :catalog/unreachable
+ [
+{:unreachable/authority "Ministry of Corporate Affairs, Companies Register (RA000394)"
+   :unreachable/url "https://www.mca.gov.in/mcafoportal/companyLLPMasterData.do"
+   :unreachable/observed "HTTP 403 to the gate's User-Agent"
+   :unreachable/consequence "The register GLEIF names as this entity's register of record AND validation authority is NOT cited below. CIN L17110MH1973PLC019786 rests on GLEIF alone."}
+  {:unreachable/authority "OpenCorporates"
+   :unreachable/url "https://opencorporates.com/companies/in/L17110MH1973PLC019786"
+   :unreachable/observed "HTTP 200 carrying an hCaptcha challenge page, not the company record"
+   :unreachable/consequence "Rejected. The 200 is the trap: a row asserting some substring of a challenge page would go green forever. GLEIF's ocid field is cited instead, as GLEIF's claim about OpenCorporates rather than as OpenCorporates' own record."}
+  {:unreachable/authority "BSE Ltd (Bombay Stock Exchange)"
+   :unreachable/url "https://api.bseindia.com/downloads1/List_Scrips.csv"
+   :unreachable/observed "HTTP 200 returning the site's JavaScript shell (13,996 bytes, zero occurrences of 'reliance') for both the scrip list and the company page"
+   :unreachable/consequence "Rejected deliberately. A second Indian exchange would have been the best available substitute for the unreachable home register; it does not serve data to a plain GET."}
+  {:unreachable/authority "U.S. Securities and Exchange Commission (EDGAR)"
+   :unreachable/url "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&company=reliance+industries"
+   :unreachable/observed "HTTP 403 to the gate's User-Agent; data.sec.gov returned 404 for the CIK tried"
+   :unreachable/consequence "Not cited. SEC requires a self-identifying User-Agent the gate does not send."}
+  {:unreachable/authority "Luxembourg Stock Exchange"
+   :unreachable/url "https://www.luxse.com/security/US7594701077/389971"
+   :unreachable/observed "HTTP 500; the site's search endpoints answer 404"
+   :unreachable/consequence "Not cited. The GDR ISIN is attested by GLEIF only."}
+  {:unreachable/authority "ESMA Registers (FIRDS)"
+   :unreachable/url "https://registers.esma.europa.eu/publication/searchRegister?core=esma_registers_firds"
+   :unreachable/observed "HTTP 200, but the body is the search application shell with zero occurrences of 'reliance'"
+   :unreachable/consequence "Rejected for the same reason as BSE: it answers, and it says nothing."}
+ ]
+ :catalog/entries
+ [
+  {:cite/id "gleif-lei"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"lei\":\"5493003UOETFYRONLG31\""
+   :cite/claim "GLEIF issues LEI 5493003UOETFYRONLG31."}
+  {:cite/id "gleif-legal-name"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"name\":\"RELIANCE INDUSTRIES LIMITED\""
+   :cite/claim "The legal name on that LEI is RELIANCE INDUSTRIES LIMITED."}
+  {:cite/id "gleif-registered-as"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"registeredAs\":\"L17110MH1973PLC019786\""
+   :cite/claim "GLEIF records Indian CIN L17110MH1973PLC019786 as this entity's registration number."}
+  {:cite/id "gleif-validated-as"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"validatedAs\":\"L17110MH1973PLC019786\""
+   :cite/claim "The same CIN is what the LOU validated the record against."}
+  {:cite/id "gleif-ocid"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"ocid\":\"in\\/L17110MH1973PLC019786\""
+   :cite/claim "OpenCorporates id in/L17110MH1973PLC019786. Note GLEIF escapes the forward slash."}
+  {:cite/id "gleif-bic"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"bic\":[\"REILINBBXXX\"]"
+   :cite/claim "SWIFT BIC REILINBBXXX is mapped to this LEI."}
+  {:cite/id "gleif-gem"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"gem\":\"E100000121175\""
+   :cite/claim "GEM (Global Entity Master) identifier."}
+  {:cite/id "gleif-qcc"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"qcc\":\"QINTCVE9G6\""
+   :cite/claim "QCC identifier."}
+  {:cite/id "gleif-spglobal"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"spglobal\":[\"878373\"]"
+   :cite/claim "S&P Global company id 878373 is mapped to this LEI."}
+  {:cite/id "gleif-managing-lou"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"managingLou\":\"213800WAVVOPS85N2205\""
+   :cite/claim "The LOU maintaining this record is itself identified by LEI 213800WAVVOPS85N2205."}
+  {:cite/id "gleif-address-line"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"3 RD FLOORMAKER CHAMBER IV 222 NARIMAN POINT\""
+   :cite/claim "Sole legal-address line recorded by GLEIF. The run-together FLOORMAKER is in the register, not a transcription slip."}
+  {:cite/id "gleif-registered-at"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"registeredAt\":{\"id\":\"RA000394\""
+   :cite/claim "GLEIF names RA000394 as the register of record. MEASURED as :attribute, not :identity -- this row survives repointing the URL at INFOSYS LIMITED, which is registered at the same RA000394."}
+  {:cite/id "gleif-validated-at"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"validatedAt\":{\"id\":\"RA000394\""
+   :cite/claim "GLEIF names the same RA000394 as the validation authority. Also :attribute for the same measured reason."}
+  {:cite/id "gleif-creation-date"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"creationDate\":\"1973-05-08T00:00:00Z\""
+   :cite/claim "Entity creation date 1973-05-08."}
+  {:cite/id "gleif-initial-registration"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"initialRegistrationDate\":\"2014-01-01T03:01:00Z\""
+   :cite/claim "The LEI itself was first issued 2014-01-01."}
+  {:cite/id "gleif-city"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"city\":\"MUMBAI\""
+   :cite/claim "City MUMBAI. True of many entities."}
+  {:cite/id "gleif-region"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"region\":\"IN-MH\""
+   :cite/claim "Subdivision IN-MH (Maharashtra)."}
+  {:cite/id "gleif-country"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"country\":\"IN\""
+   :cite/claim "Country IN."}
+  {:cite/id "gleif-postal"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"postalCode\":\"400021\""
+   :cite/claim "Postal code 400021."}
+  {:cite/id "gleif-jurisdiction"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"jurisdiction\":\"IN\""
+   :cite/claim "Jurisdiction IN."}
+  {:cite/id "gleif-legal-form"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"legalForm\":{\"id\":\"DDKQ\""
+   :cite/claim "Legal form code DDKQ."}
+  {:cite/id "gleif-entity-status"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"status\":\"ACTIVE\""
+   :cite/claim "Entity status ACTIVE."}
+  {:cite/id "gleif-registration-status"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"status\":\"ISSUED\""
+   :cite/claim "Registration status ISSUED."}
+  {:cite/id "gleif-corroboration"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"corroborationLevel\":\"FULLY_CORROBORATED\""
+   :cite/claim "GLEIF rates this record FULLY_CORROBORATED."}
+  {:cite/id "gleif-category"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"category\":\"GENERAL\""
+   :cite/claim "Entity category GENERAL."}
+  {:cite/id "gleif-conformity"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31"
+   :cite/expect-substring "\"conformityFlag\":\"CONFORMING\""
+   :cite/claim "Conformity flag CONFORMING."}
+  {:cite/id "gleif-ra-organisation"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000394"
+   :cite/expect-substring "\"internationalOrganizationName\":\"Ministry of Corporate Affairs\""
+   :cite/claim "RA000394 resolves to the Ministry of Corporate Affairs. Says nothing about Reliance."}
+  {:cite/id "gleif-ra-register"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000394"
+   :cite/expect-substring "\"internationalName\":\"Companies Register\""
+   :cite/claim "The register behind RA000394 is the Companies Register."}
+  {:cite/id "gleif-ra-website"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000394"
+   :cite/expect-substring "\"website\":\"http:\\/\\/www.mca.gov.in\\/MCA21\\/\""
+   :cite/claim "RA000394's own website. Slashes escaped by GLEIF; the unescaped form occurs nowhere."}
+  {:cite/id "gleif-ra-country"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000394"
+   :cite/expect-substring "\"countryCode\":\"IN\""
+   :cite/claim "RA000394 is an Indian authority."}
+  {:cite/id "gleif-elf-name"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/entity-legal-forms/DDKQ"
+   :cite/expect-substring "\"localName\":\"Public Limited Company\""
+   :cite/claim "Legal-form code DDKQ resolves to Public Limited Company."}
+  {:cite/id "gleif-elf-country"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/entity-legal-forms/DDKQ"
+   :cite/expect-substring "\"country\":\"India\""
+   :cite/claim "DDKQ is an Indian legal form."}
+  {:cite/id "gleif-elf-status"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/entity-legal-forms/DDKQ"
+   :cite/expect-substring "\"status\":\"ACTV\""
+   :cite/claim "DDKQ is an active code, not a retired one."}
+  {:cite/id "gleif-uk-child-name"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/254900WB9F3303L38961"
+   :cite/expect-substring "\"name\":\"RELIANCE GLOBAL ENERGY SERVICES LIMITED\""
+   :cite/claim "GLEIF records a UK entity of this name under LEI 254900WB9F3303L38961."}
+  {:cite/id "gleif-uk-child-number"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/254900WB9F3303L38961"
+   :cite/expect-substring "\"registeredAs\":\"06626084\""
+   :cite/claim "GLEIF gives that UK entity Companies House number 06626084."}
+  {:cite/id "gleif-uk-child-ra"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/254900WB9F3303L38961"
+   :cite/expect-substring "\"registeredAt\":{\"id\":\"RA000585\""
+   :cite/claim "GLEIF names RA000585 (Companies House) as that entity's register."}
+  {:cite/id "gleif-uk-child-parent"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/254900WB9F3303L38961/direct-parent"
+   :cite/expect-substring "\"lei\":\"5493003UOETFYRONLG31\""
+   :cite/claim "Asked for the DIRECT PARENT of the UK entity, GLEIF returns this LEI. This is the link the UK register itself does not make."}
+  {:cite/id "gleif-uk-child-parent-name"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/254900WB9F3303L38961/direct-parent"
+   :cite/expect-substring "\"name\":\"RELIANCE INDUSTRIES LIMITED\""
+   :cite/claim "And names that parent RELIANCE INDUSTRIES LIMITED."}
+  {:cite/id "gleif-my-child-name"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493001554EFZ9379474"
+   :cite/expect-substring "\"name\":\"RECRON (MALAYSIA) SDN. BHD.\""
+   :cite/claim "GLEIF records a Malaysian entity RECRON (MALAYSIA) SDN. BHD. under LEI 5493001554EFZ9379474."}
+  {:cite/id "gleif-my-child-number"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493001554EFZ9379474"
+   :cite/expect-substring "\"registeredAs\":\"200701023752 (781769-K)\""
+   :cite/claim "With Malaysian company number 200701023752 (781769-K)."}
+  {:cite/id "gleif-my-child-parent"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493001554EFZ9379474/ultimate-parent"
+   :cite/expect-substring "\"lei\":\"5493003UOETFYRONLG31\""
+   :cite/claim "GLEIF returns this LEI as that Malaysian entity's ULTIMATE parent. It has no direct-parent record: /direct-parent answers 404, which is why this row cites /ultimate-parent."}
+  {:cite/id "gleif-isin-gdr"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31/isins"
+   :cite/expect-substring "\"US7594701077\""
+   :cite/claim "GLEIF maps ISIN US7594701077 to this LEI."}
+  {:cite/id "gleif-isin-bond"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5493003UOETFYRONLG31/isins"
+   :cite/expect-substring "\"US759470AR84\""
+   :cite/claim "GLEIF maps bond ISIN US759470AR84 to this LEI."}
+  {:cite/id "uk-ch-title"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :identity
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084"
+   :cite/expect-substring "<title data-id=\"company_profile\">RELIANCE GLOBAL ENERGY SERVICES LIMITED overview"
+   :cite/claim "Companies House prints that legal name in its own record."}
+  {:cite/id "uk-ch-number"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :identity
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084"
+   :cite/expect-substring "<strong>06626084</strong>"
+   :cite/claim "And that company number, which GLEIF gave independently."}
+  {:cite/id "uk-ch-office"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :identity
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084"
+   :cite/expect-substring "8th Floor, 105, Wigmore Street, London, W1U 1QY"
+   :cite/claim "Registered office. GLEIF records the same street for the same entity."}
+  {:cite/id "uk-ch-incorporated"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :attribute
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084"
+   :cite/expect-substring "<dd class=\"data\" id=\"company-creation-date\">20 June 2008</dd>"
+   :cite/claim "Incorporated 20 June 2008."}
+  {:cite/id "uk-ch-sic-petroleum"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :attribute
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084"
+   :cite/expect-substring "46711 - Wholesale of petroleum and petroleum products"
+   :cite/claim "Nature of business: wholesale of petroleum products."}
+  {:cite/id "uk-ch-sic-support"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :attribute
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084"
+   :cite/expect-substring "82990 - Other business support service activities not elsewhere classified"
+   :cite/claim "Second SIC code."}
+  {:cite/id "uk-ch-psc-none"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :attribute
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084/persons-with-significant-control"
+   :cite/expect-substring "The company knows or has reasonable cause to believe that there is no registrable person or registrable relevant legal entity in relation to the company"
+   :cite/claim "READ THIS ONE. The UK register carries NO person of significant control for the subsidiary -- it does not name Reliance. The parent link is GLEIF's alone."}
+  {:cite/id "uk-ch-psc-notified"
+   :cite/authority :uk-companies-house
+   :cite/row-kind :attribute
+   :cite/url "https://find-and-update.company-information.service.gov.uk/company/06626084/persons-with-significant-control"
+   :cite/expect-substring "<dd id=\"psc-statement-notified-on-1\" class=\"data\">"
+   :cite/claim "That statement is a filed PSC statement, notified 2016, not an absence of filing."}
+  {:cite/id "nse-listing-row"
+   :cite/authority :in-nse
+   :cite/row-kind :identity
+   :cite/url "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+   :cite/expect-substring "RELIANCE,Reliance Industries Limited,EQ,29-NOV-1995,10,1,INE002A01018,10"
+   :cite/claim "NSE's own equity list names Reliance Industries Limited, symbol RELIANCE, listed 29-NOV-1995, ISIN INE002A01018."}
+  {:cite/id "nse-domestic-isin"
+   :cite/authority :in-nse
+   :cite/row-kind :identity
+   :cite/url "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+   :cite/expect-substring "INE002A01018"
+   :cite/claim "The domestic ISIN. GLEIF does NOT carry it -- its ISIN list holds only the US-numbered GDR and bonds."}
+  {:cite/id "nse-header"
+   :cite/authority :in-nse
+   :cite/row-kind :definition
+   :cite/url "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+   :cite/expect-substring "SYMBOL,NAME OF COMPANY, SERIES, DATE OF LISTING, PAID UP VALUE, MARKET LOT, ISIN NUMBER, FACE VALUE"
+   :cite/claim "The file's own header, so the columns above are read as NSE labels them."}
+  {:cite/id "issuer-privacy-title"
+   :cite/authority :issuer
+   :cite/row-kind :identity
+   :cite/url "https://www.ril.com/privacy-policy"
+   :cite/expect-substring "<title>Privacy Policy | Reliance Industries Limited</title>"
+   :cite/claim "The page this repository archives still serves a Privacy Policy, and the issuer names itself on it."}
+  {:cite/id "issuer-contact-title"
+   :cite/authority :issuer
+   :cite/row-kind :identity
+   :cite/url "https://www.ril.com/contact-us"
+   :cite/expect-substring "<title>Contact Us - Reliance Industries Limited</title>"
+   :cite/claim "The issuer names itself in its own page title."}
+  {:cite/id "issuer-registered-address"
+   :cite/authority :issuer
+   :cite/row-kind :identity
+   :cite/url "https://www.ril.com/contact-us"
+   :cite/expect-substring "<li class=\"pin\">Reliance Industries Limited Maker Chambers - IV, Nariman Point Mumbai 400 021, India</li>"
+   :cite/claim "The issuer publishes the same Nariman Point address GLEIF records -- as 'Maker Chambers - IV', where the register writes 'MAKER CHAMBER IV'."}
+  {:cite/id "issuer-contact-email"
+   :cite/authority :issuer
+   :cite/row-kind :attribute
+   :cite/url "https://www.ril.com/contact-us"
+   :cite/expect-substring "mailto:info@ril.com"
+   :cite/claim "Published contact address on the same page."}
+ ]}
