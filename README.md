@@ -25,7 +25,7 @@ before it was written down; nothing in that file is asserted from memory.
 Check them against the live web:
 
 ```sh
-nbb tools/verify_citations.cljk facts/catalog.edn --min 50
+kbb --backend sci tools/verify_citations.cljk facts/catalog.edn --min 50
 ```
 
 Exit codes are three, not two — "nothing was checked" must not look like
